@@ -1,40 +1,129 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class BgImage extends StatefulWidget {
-  const BgImage(
-      {super.key,
-      required this.currentIndex,
-      required this.imageFood,
-      required this.pageOffset});
+import '../../../food_model.dart';
+import '../../utils/function/get_current_offset_page_controller.dart';
+import '../widget/rotated_image_backgroud_widget.dart';
+import '../widget/rotated_image_widget.dart';
 
-  final int currentIndex;
-  final String imageFood;
-  final double pageOffset;
+class MyFoodScreen extends StatefulWidget {
+  const MyFoodScreen({super.key});
 
   @override
-  State<BgImage> createState() => _BgImageState();
+  State<MyFoodScreen> createState() => _MyFoodScreenState();
 }
 
-class _BgImageState extends State<BgImage> {
+class _MyFoodScreenState extends State<MyFoodScreen>
+    with SingleTickerProviderStateMixin {
+  late PageController pageController;
+  List<FoodModel> foodlist = foodList;
+
+  double currentOffset() => getCurrentOffsetPageController(pageController);
+
+  int get currentIndex => currentOffset().round() % foodlist.length;
+
+  @override
+  void initState() {
+    pageController = PageController(
+      initialPage: foodlist.length,
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: AnimatedBuilder(
+        animation: pageController,
+        builder: (context, child) {
+          return _buildScreen();
+        },
+      ),
+    );
+  }
+
+  Stack _buildScreen() {
     final Size size = MediaQuery.of(context).size;
-    double value = (widget.pageOffset - widget.currentIndex).abs();
-    return Opacity(
-      opacity: 0.2,
-      child: Transform.rotate(
-        angle: (pi * value) + (pi / 180),
-        child: SizedBox(
-          width: size.width * 1.5,
-          height: size.width * 1.5,
-          child: Image.asset(
-            widget.imageFood,
-            fit: BoxFit.cover,
+    final FoodModel currentFood = foodlist[currentIndex];
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Positioned(
+          top: -size.width * 0.6,
+          child: RotatedImageBackgroundWidget(
+            currentIndex: currentIndex,
+            imageFood: currentFood.image,
+            pageOffset: currentOffset(),
           ),
         ),
-      ),
+        SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                currentFood.name,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "\$${currentFood.price}",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 25,
+                  color: Colors.pink.shade800,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+              SizedBox(height: size.height * 0.1),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: size.width * 0.3,
+                      vertical: size.height * 0.03,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    )),
+                onPressed: () {},
+                child: const Text(
+                  "Add to cart",
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "Swipe to see Recipes",
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Center(
+          child: SizedBox(
+            height: size.width,
+            child: RotatedImageWidget(
+              currentOffset: currentOffset(),
+              image: (index) => foodlist[index % foodlist.length].image,
+              pageController: pageController,
+            ) 
+          ),
+        ),
+      ],
     );
   }
 }
