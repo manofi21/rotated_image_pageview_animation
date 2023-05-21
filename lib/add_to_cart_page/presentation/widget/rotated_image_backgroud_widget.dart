@@ -1,6 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+
+import '../../utils/get_angel_value/get_angel_value.dart';
 
 class RotatedImageBackgroundWidget extends StatefulWidget {
   const RotatedImageBackgroundWidget(
@@ -21,11 +21,11 @@ class _RotatedImageBackgroundWidgetState extends State<RotatedImageBackgroundWid
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    double value = (widget.pageOffset - widget.currentIndex).abs();
+    final valueForRotatingBackground = GetValueForRotatingBackground(widget.currentIndex, widget.pageOffset);
     return Opacity(
       opacity: 0.2,
       child: Transform.rotate(
-        angle: (pi * value) + (pi / 180),
+        angle: valueForRotatingBackground.calculateValueByPi(),
         child: SizedBox(
           width: size.width * 1.5,
           height: size.width * 1.5,

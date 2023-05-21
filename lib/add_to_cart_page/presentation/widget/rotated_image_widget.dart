@@ -1,8 +1,7 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:rotated_image_pageview_animation/add_to_cart_page/utils/get_angel_value/get_angel_value.dart';
 
 import '../../utils/function/get_scale_for_rotated_image.dart';
-import '../../utils/function/get_value_for_rotating_image.dart';
 
 class RotatedImageWidget extends StatefulWidget {
   final PageController pageController;
@@ -26,10 +25,10 @@ class _RotatedImageWidgetState extends State<RotatedImageWidget> {
       controller: widget.pageController,
       itemBuilder: (context, index) {
         double scaleImage = getScaleForRotatedImage(widget.currentOffset, index);
-        double rotatedImageValue = getValueForRotatingImage(index, widget.pageController);
+        final rotatedImageValue = GetValueForRotatingImage(index, widget.pageController);
 
         return Transform.rotate(
-          angle: pi * rotatedImageValue,
+          angle: rotatedImageValue.calculateValueByPi(),
           child: Padding(
             padding: EdgeInsets.only(bottom: 200 - scaleImage * 5),
             child: FittedBox(
